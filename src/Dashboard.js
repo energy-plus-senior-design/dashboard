@@ -171,15 +171,15 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
+            <Grid item xs={12} md={12} lg={12}>
               <Paper className={fixedHeightPaper}>
-                <Chart />
+                <Chart title={"Linear Model"} csvName={"LassoEnergyPredict.csv"}/>
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={8} lg={9}>
+            <Grid item xs={12} md={12} lg={12}>
               <Paper className={fixedHeightPaper}>
-                <Chart />
+                <Chart title={"Eric's Model"} csvName={"Eric.csv"}/>
               </Paper>
             </Grid>
 
