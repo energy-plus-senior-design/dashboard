@@ -19,6 +19,7 @@
     "react": "latest",
     "react-chartjs-2": "^2.8.0",
     "react-dom": "latest",
+    "react-hammerjs": "^1.0.1",
     "react-scripts": "latest",
     "recharts": "^1.8.0"
   },

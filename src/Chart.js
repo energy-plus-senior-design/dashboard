@@ -1,8 +1,10 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
-import { Line as ChartJSLine, Scatter } from 'react-chartjs-2';
+import { Line as ChartJSLine, Scatter, Chart as ChartChart } from 'react-chartjs-2';
 import Title from './Title';
 import * as d3 from 'd3';
+import Hammer from 'react-hammerjs';
+import zoom from 'chartjs-plugin-zoom'
 
 import lasso_energy_predict from './data/LassoEnergyPredict.csv';
 
@@ -30,7 +32,9 @@ export default class Chart extends React.Component {
       // this.setState({...this.state, "y_pred": [...this.state.y_pred,parseFloat(cell["y_pred"])]})
     });
   }
-
+  componentWillMount(){
+    ChartChart.plugins.register(zoom)
+}
   render() {
     return (
       <React.Fragment>
