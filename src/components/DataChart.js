@@ -3,16 +3,13 @@ import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recha
 import { Line as ChartJSLine, Scatter, Chart as ChartChart } from 'react-chartjs-2';
 import Title from './Title';
 import * as d3 from 'd3';
-import Hammer from 'react-hammerjs';
 import zoom from 'chartjs-plugin-zoom'
-
-import lasso_energy_predict from './data/LassoEnergyPredict.csv';
 
 export default class Chart extends React.Component {
   constructor(props) {
     super(props);
 
-    var csv = require(`./data/${this.props["csvName"]}`);
+    var csv = require(`../data/${this.props["csvName"]}`);
 
     this.state = {"x": [], "y_true": [], "y_pred": []}
     let x = [], y_true = [], y_pred = [];
@@ -21,15 +18,9 @@ export default class Chart extends React.Component {
         x.push(Math.round(parseFloat(cell["index"])))
         y_true.push(parseFloat(cell["y_true"]))
         y_pred.push(parseFloat(cell["y_pred"]))
-        
       })
-      console.log(x)
-      console.log(y_true)
-      console.log(y_pred)
+
       this.setState({"x": x, "y_true": y_true, "y_pred": y_pred})
-      //   ...this.state, "x": [...this.state.x,Math.round(parseFloat(cell["index"]))]})
-      // this.setState({...this.state, "y_true": [...this.state.y_true,parseFloat(cell["y_true"])]})
-      // this.setState({...this.state, "y_pred": [...this.state.y_pred,parseFloat(cell["y_pred"])]})
     });
   }
   componentWillMount(){
@@ -38,7 +29,7 @@ export default class Chart extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Title>{this.props["title"]}</Title>yar
+        <Title>{this.props["title"]}</Title>
         <ResponsiveContainer>
           <ChartJSLine data= {{
                 labels: this.state.x,
@@ -60,7 +51,7 @@ export default class Chart extends React.Component {
                         borderColor: 'rgba(99, 132, 255, 1)',
                         borderWidth: 1,
                         pointRadius: 0
-                    }                
+                    }
                 ]
             }} options= {{
               scales: {
@@ -88,7 +79,7 @@ export default class Chart extends React.Component {
                   // Eg. 'y' would only allow zooming in the y direction
                   mode: 'xy',
               }
-          }}            
+          }}
           />
         </ResponsiveContainer>
       </React.Fragment>
