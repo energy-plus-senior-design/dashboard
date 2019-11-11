@@ -1,27 +1,29 @@
 import React from 'react';
-import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Link from '@material-ui/core/Link';
-import ProTip from './ProTip';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
 
-import Dashboard from "./Dashboard"
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import Layout from "./components/Layout"
+import PerformanceDashboard from "./PerformanceDashboard"
+import RealtimeDashboard from "./RealtimeDashboard"
 
 export default function App() {
   return (
-    <Dashboard />
+    <Router>
+      <Redirect exact from="/" to="models" />
+      <Layout>
+        <Switch>
+          <Route path="/models">
+            <PerformanceDashboard />
+          </Route>
+          <Route path="/predictions">
+            <RealtimeDashboard />
+          </Route>
+        </Switch>
+      </Layout>
+    </Router>
   );
 }
