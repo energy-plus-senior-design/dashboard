@@ -1,53 +1,114 @@
 import React from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
+
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import Link from '@material-ui/core/Link';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import { mainListItems } from './components/listItems';
-import DataChart from './components/DataChart';
+import Slider from '@material-ui/core/Slider';
+import NetworkChart from './components/NetworkChart';
+import {Drawer, List, ListItem, Divider, CssBaseline} from '@material-ui/core';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 export default function Dashboard() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const [model, setModel] = React.useState('hybrid');
+
+  const [control_state, set_control_state] = React.useState({
+    'Zone Thermostat Cooling Setpoint Temperature': 25,
+    'Zone Thermostat Heating Setpoint Temperature': 18,
+    'Zone Outdoor Air Drybulb Temperature': 15,
+    'Zone Outdoor Air Wetbulb Temperature': 11,
+    'Zone Outdoor Air Wind Speed': 2,
+    'Zone People Occupant Count': 8,
+  });
+
+  const ranges = {
+    'Zone Thermostat Cooling Setpoint Temperature': [20, 30],
+    'Zone Thermostat Heating Setpoint Temperature': [15, 25],
+    'Zone Outdoor Air Drybulb Temperature': [-40, 40],
+    'Zone Outdoor Air Wetbulb Temperature': [-30, 30],
+    'Zone Outdoor Air Wind Speed': [0, 5],
+    'Zone People Occupant Count': [0, 20],
+  }
+
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+
   return (
-    <Grid container spacing={3}>
-      {/* DataChart */}
-      <Grid item xs={12} md={12} lg={12}>
-        <Paper className={fixedHeightPaper}>
-          <DataChart title={"Linear Model"} csvName={"LassoEnergyPredict.csv"}/>
-        </Paper>
-      </Grid>
+    <div className={classes.root}>
+      <CssBaseline />
 
-      <Grid item xs={12} md={12} lg={12}>
-        <Paper className={fixedHeightPaper}>
-          <DataChart title={"Eric's Model"} csvName={"Eric.csv"}/>
-        </Paper>
-      </Grid>
+      <div className={classes.content}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper className={fixedHeightPaper}>
+              <NetworkChart
+                title={"Hybrid Model Prediction"}
+                control_state={control_state}
+                api_url={'http://localhost:8000/api/hybrid/predict'}
+              />
+            </Paper>
+          </Grid>
 
-    </Grid>
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper className={fixedHeightPaper}>
+              <NetworkChart
+                title={"Explicit RNN Prediction"}
+                control_state={control_state}
+                api_url={'http://localhost:8000/api/explicit-rnn/predict'}
+              />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper className={fixedHeightPaper}>
+              <NetworkChart
+                title={"Implicit RNN Prediction"}
+                control_state={control_state}
+                api_url={'http://localhost:8000/api/implicit-rnn/predict'}
+              />
+            </Paper>
+          </Grid>
+        </Grid>
+      </div>
+
+      <Drawer
+        anchor="right"
+        variant="permanent"
+        className={classes.drawer}
+        classes={{
+          paper: classes.drawerPaper
+        }}
+      >
+        <h2 className={classes.drawerTitle}>Control Input</h2>
+        <Divider/>
+        <div style={{"padding": "20px"}}>
+          {sliders(control_state, set_control_state, ranges, classes)}
+        </div>
+      </Drawer>
+    </div>
   );
+}
+
+const sliders = (control_state, set_control_state, ranges, classes) => {
+  const control_vars = Object.keys(control_state)
+  return control_vars.map(u => (
+    <div>
+      <Typography id="vertical-slider" gutterBottom>
+        {u}
+      </Typography>
+      <Slider
+        className={classes.slider}
+        value={control_state[u]}
+        onChange={(e, val) => set_control_state(Object.assign({}, control_state, {[u]: val}))}
+        aria-labelledby="vertical-slider"
+        min={ranges[u][0]}
+        max={ranges[u][1]}
+      />
+    </div>
+  ))
 }
 
 // Styles
@@ -55,69 +116,11 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
   },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
+  drawerTitle: {
+    padding: '0 16px',
   },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
-    },
-  },
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+  slider: {
+    // padding: '16px 0',
   },
   paper: {
     padding: theme.spacing(2),
@@ -126,6 +129,18 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
   },
   fixedHeight: {
-    height: 300,
+    height: 400,
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3),
   },
 }));

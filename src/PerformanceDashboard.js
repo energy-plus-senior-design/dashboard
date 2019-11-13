@@ -1,15 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Container from '@material-ui/core/Container';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
@@ -17,35 +10,80 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { mainListItems } from './components/listItems';
 import DataChart from './components/DataChart';
+import DataChart2 from "./components/DataChart2";
+import AggregateChart from "./components/AggregateChart";
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 export default function Dashboard() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+
+  const [variable, setVariable] = React.useState('Electricity:Facility');
+
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  const handleChange = event => {
+    console.log("fired")
+    setVariable(event.target.value);
+  }
 
   return (
     <Grid container spacing={3}>
       {/* DataChart */}
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        value={variable}
+        onChange={handleChange}
+        className={classes.mySelect}
+      >
+        <MenuItem value={"Electricity:Facility"}>Electricity</MenuItem>
+        <MenuItem value={"Gas:Facility"}>Gas</MenuItem>
+      </Select>
+
+      {/* <Grid item xs={12} md={12} lg={12}>
+        <Paper className={fixedHeightPaper}>
+          <AggregateChart
+            title={"Hybrid Model"}
+            series={["hybrid/hybrid_2019-11-12_2_y_real.csv, hybrid/hybrid_2019-11-12_2_y_pred.csv", "explicit_rnn/y_pred.csv", "implicit_rnn/implicit_rnn_2019-11-11_y_pred.csv"]}
+            labels={["Ground Truth, Hybrid, Explicit RNN, Implicit RNN"]}
+            variable={variable}
+          />
+        </Paper>
+      </Grid> */}
+
       <Grid item xs={12} md={12} lg={12}>
         <Paper className={fixedHeightPaper}>
-          <DataChart title={"Linear Model"} csvName={"LassoEnergyPredict.csv"}/>
+          <DataChart2
+            title={"Hybrid Model"}
+            y_real_path={"hybrid/hybrid_2019-11-12_2_y_real.csv"}
+            y_pred_path={"hybrid/hybrid_2019-11-12_2_y_pred.csv"}
+            variable={variable}
+          />
         </Paper>
       </Grid>
 
       <Grid item xs={12} md={12} lg={12}>
         <Paper className={fixedHeightPaper}>
-          <DataChart title={"Eric's Model"} csvName={"Eric.csv"}/>
+          <DataChart2
+            title={"Explicit RNN Model"}
+            y_real_path={"explicit_rnn/y_real.csv"}
+            y_pred_path={"explicit_rnn/y_pred.csv"}
+            variable={variable}
+          />
         </Paper>
       </Grid>
 
+      <Grid item xs={12} md={12} lg={12}>
+        <Paper className={fixedHeightPaper}>
+          <DataChart2
+            title={"Implicit RNN"}
+            y_real_path={"implicit_rnn/implicit_rnn_2019-11-11_y_real.csv"}
+            y_pred_path={"implicit_rnn/implicit_rnn_2019-11-11_y_pred.csv"}
+            variable={variable}
+          />
+        </Paper>
+      </Grid>
     </Grid>
   );
 }
@@ -72,19 +110,14 @@ const useStyles = makeStyles(theme => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
   menuButton: {
     marginRight: 36,
   },
   menuButtonHidden: {
     display: 'none',
+  },
+  mySelect: {
+    margin: theme.spacing(2),
   },
   title: {
     flexGrow: 1,
