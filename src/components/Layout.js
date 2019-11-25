@@ -56,7 +56,7 @@ export default function Dashboard({children}) {
         <List>{mainListItems}</List>
       </Drawer>
       <main className={classes.content}>
-        <Container maxWidth="lg" className={classes.container}>
+        <Container maxWidth="false" className={classes.container}>
           <h1 className={classes.pageTitle}>Models</h1>
           {children}
         </Container>

@@ -5,7 +5,8 @@ import Title from './Title';
 import * as d3 from 'd3';
 import zoom from 'chartjs-plugin-zoom'
 import axios from 'axios'
-import { Button, Slider, Typography } from '@material-ui/core';
+import { Icon, IconButton } from '@material-ui/core';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import 'chartjs-plugin-streaming';
 var querystring = require('querystring')
 
@@ -13,7 +14,15 @@ export default class NetworkChart extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {"x": [], "y_pred": [], "count": 0, "should_poll": false}
+    this.state = {"x": [], "y_pred": [], "count": 0, "should_poll": true}
+  }
+
+  componentWillMount() {
+    this.startRequests()
+  }
+
+  componentWillUnmount() {
+    this.stopRequests()
   }
 
   startRequests = async () => {
@@ -27,10 +36,10 @@ export default class NetworkChart extends React.Component {
       x.push(Date.now())
       y_pred.push({x: Date.now(), y: data["Electricity:Facility"]})
 
-      if (x.length > 30) {
+      if (x.length > 50) {
         x.shift()
       }
-      if(y_pred.length > 30) {
+      if(y_pred.length > 50) {
         y_pred.shift()
       }
 
@@ -54,6 +63,8 @@ export default class NetworkChart extends React.Component {
     return (
       <React.Fragment>
         <Title>{this.props["title"]}</Title>
+        {/* <IconButton style={{float: "right"}}><RefreshIcon/></IconButton> */}
+
         <ResponsiveContainer>
           <ChartJSLine data= {{
                 // labels: this.state.x,
@@ -71,23 +82,45 @@ export default class NetworkChart extends React.Component {
             }}
 
             options={{
+              animation: {
+                duration: 0                    // general animation time
+            },
+            hover: {
+                animationDuration: 0           // duration of animations when hovering an item
+            },
+            responsiveAnimationDuration: 0,    // animation duration after a resize
+            plugins: {
+                streaming: {
+                    frameRate: 30               // chart is drawn 5 times every second
+                }
+            },
               scales: {
                 xAxes: [{
-                  type: 'realtime'
+                  type: 'realtime',
+                  realtime: {
+                    duration: 15000,
+                    delay: 2000,
+                    ttl: undefined,
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Timestep (1 hour)",
+                  },
                 }],
                 yAxes: [{
                   ticks: {
-                      suggestedMin: -2,
-                      suggestedMax: 2
-                  }
+                      suggestedMin: 0,
+                      suggestedMax: 700000000
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Energy Consumption (J)",
+                  },
               }]
               }
             }}
           />
         </ResponsiveContainer>
-
-        <Button onClick={this.startRequests}>Start API</Button>
-        <Button onClick={this.stopRequests}>Stop API</Button>
       </React.Fragment>
     );
   }

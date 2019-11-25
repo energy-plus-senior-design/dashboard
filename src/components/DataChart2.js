@@ -76,9 +76,19 @@ export default class MyChart extends React.Component {
             }} options= {{
               scales: {
                   yAxes: [{
-                      ticks: {
-                          beginAtZero:true
-                      }
+                    scaleLabel: {
+                      display: true,
+                      labelString: "Energy Consumption (J)",
+                    },
+                    ticks: {
+                        beginAtZero:true
+                    }
+                  }],
+                  xAxes: [{
+                    scaleLabel: {
+                      display: true,
+                      labelString: "Timestep (1 hour)",
+                    },
                   }]
               },
               pan:{
